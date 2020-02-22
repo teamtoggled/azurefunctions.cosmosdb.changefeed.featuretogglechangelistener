@@ -21,7 +21,7 @@ namespace azurefunctions.cosmosdb.changefeed.featuretogglechangelistener
             log.LogInformation("Documents modified " + input.Count);
             log.LogInformation("First document Id " + input[0].Id);
         
-            return "Literally, anything.";
+            return input[0].Id;
         }
     }
 }
