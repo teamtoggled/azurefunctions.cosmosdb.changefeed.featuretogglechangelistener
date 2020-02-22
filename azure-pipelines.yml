@@ -9,7 +9,7 @@ trigger:
 variables:
   # Azure Resource Manager connection created during pipeline creation
   # Note this is NOT an Azure Subscription ID and is useless outside of Azure Pipelines Resource Manager so is safe to commit to a public repo.
-  azureSubscription: '98b8c1e2-4bf4-4a43-86fe-ad8664d03b91'
+  azureSubscription: '$(ResourceManagerId)'
 
   # Function app name
   functionAppName: '$(AzureFunctionAppName)'
