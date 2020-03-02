@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.Azure.Documents;
 using Microsoft.Azure.WebJobs;
+using Microsoft.Azure.WebJobs.ServiceBus;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
@@ -10,12 +11,12 @@ namespace azurefunctions.cosmosdb.changefeed.featuretogglechangelistener
     public static class FeatureToggledChangeListener
     {
         [FunctionName("FeatureToggledChangeListener")]
-        [return: ServiceBus("%ServiceBusQueueName%", Connection = "ServiceBusConnection")]
-        public static string Run([CosmosDBTrigger(
+        public static void Run([CosmosDBTrigger(
             databaseName: "%DatabaseName%",
             collectionName: "%CollectionName%",
             ConnectionStringSetting = "CosmosDbConnection",
-            LeaseCollectionName = "leases")]IReadOnlyList<Document> input, ILogger log)
+            LeaseCollectionName = "leases")]IReadOnlyList<Document> input, ILogger log,
+            [ServiceBus("%ServiceBusQueueName%", Connection = "ServiceBusConnection", EntityType = EntityType.Queue)] ICollector<string> queueCollector)
         {
             foreach(var doc in input)
             {
@@ -29,13 +30,10 @@ namespace azurefunctions.cosmosdb.changefeed.featuretogglechangelistener
 
                 var eventJson = JsonConvert.SerializeObject(featureToggleChangedEvent);
 
-                log.LogInformation($"Raising event: {eventJson}");
+                log.LogInformation($"Added event to list for raising: {eventJson}");
 
-                // TODO: Work as intended with multiple documents in the loop
-                return eventJson;         
+                queueCollector.Add(eventJson);         
             }
-
-            return null;                    
         }
     }
 }
