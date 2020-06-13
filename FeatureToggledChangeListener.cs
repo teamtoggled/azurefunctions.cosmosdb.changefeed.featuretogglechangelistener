@@ -15,7 +15,8 @@ namespace azurefunctions.cosmosdb.changefeed.featuretogglechangelistener
             databaseName: "%DatabaseName%",
             collectionName: "%CollectionName%",
             ConnectionStringSetting = "CosmosDbConnection",
-            LeaseCollectionName = "leases")]IReadOnlyList<Document> input, ILogger log,
+            LeaseCollectionName = "leases",
+            CreateLeaseCollectionIfNotExists = true)]IReadOnlyList<Document> input, ILogger log,
             [ServiceBus("%ServiceBusQueueName%", Connection = "ServiceBusConnection", EntityType = EntityType.Queue)] ICollector<string> queueCollector)
         {
             foreach(var doc in input)
